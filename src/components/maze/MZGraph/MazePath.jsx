@@ -1,3 +1,4 @@
+/* eslint-disable no-multi-assign */
 import _ from 'lodash';
 import { getOrthogonalKey } from '../../../utilities';
 
@@ -12,44 +13,37 @@ export class MazePath {
 }
 
 export class MazePathFactory {
-  getPathsWithRowsAndCols = ({ spacing, rows, cols }) => {
+  getPathsWithRowsAndCols = ({ spacing: r, rows, cols }) => {
     let x1;
     let x2;
     let y1;
     let y2;
-    const r = spacing;
-    const r2 = Math.round(spacing / 2);
-    const tempPathCache = [];
+    const r2 = Math.round(r / 2);
+    const tempCache = [];
 
     for (let i = 0; i < cols; i += 1) {
       for (let j = 0; j < rows - 1; j += 1) {
-        x2 = i * r;
-        x1 = i * r;
-        y1 = j * r;
-        y2 = j * r + r;
-        x1 += r2;
-        x2 += r2;
-        y1 += r2;
-        y2 += r2;
-        tempPathCache.push(new MazePath(`${x1}.${y1}`, `${x2}.${y2}`));
+        x1 = x2 = i * r;
+        y1 = y2 = j * r;
+        x1 += x2 += y1 += y2 += r2;
+        tempCache.push(new MazePath(`${x1}.${y1}`, `${x2}.${y2}`));
       }
     }
+
     for (let i = 0; i < rows; i += 1) {
       for (let j = 0; j < cols - 1; j += 1) {
         x1 = j * r;
-        y1 = i * r;
+        y1 = y2 = i * r;
         x2 = j * r + r;
-        y2 = i * r;
-        x1 += r2;
-        x2 += r2;
-        y1 += r2;
-        y2 += r2;
-        tempPathCache.push(new MazePath(`${x1}.${y1}`, `${x2}.${y2}`));
+        x1 += x2 += x2 += y1 += y2 += r2;
+        tempCache.push(new MazePath(`${x1}.${y1}`, `${x2}.${y2}`));
       }
     }
-    return tempPathCache;
+
+    return tempCache;
   };
 
+  // eslint-disable-next-line arrow-body-style
   getPathsWithInactiveWalls = ({ excludeWalls }) => {
     return _.map(excludeWalls, (w) => {
       let [x1, y1, x2, y2] = w.split('.');
