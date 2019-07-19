@@ -1,12 +1,5 @@
-/* eslint-disable no-loop-func */
-
-
 export default class MZNode {
-  constructor(initParams) {
-    const {
-      x, y, isStart, isDest, disoveredBy,
-    } = initParams;
-
+  constructor({x, y, isStart, isDest, disoveredBy}) {
     this.key = `${+x}.${+y}`;
     this.isVisited = false;
     this.isDest = isDest;

@@ -60,9 +60,7 @@ export default class UserNode extends React.Component {
   componentDidUpdate = () => {
     this.props.map.forEach(n => {
       const sibs = {};
-      n.siblingKeys.forEach(k => {
-        sibs[k] = 1;
-      });
+      n.siblingKeys.forEach(k => sibs[k] = 1);
       this.nodeMap[n.key] = sibs;
     });
     this.destNodeKey = this.props.destnodekey;
@@ -70,20 +68,29 @@ export default class UserNode extends React.Component {
   };
 
   keyboardListener = e => {
-    if (!this.cooldown && !this.keyboardCoolDown) {
-      switch (e.which) {
-        default:
-        case 38:
-        case 87: return this.move({ y: -this.offset });
-        case 39:
-        case 68: return this.move({ x: this.offset });
-        case 40:
-        case 83: return this.move({ y: this.offset });
-        case 37:
-        case 65: return this.move({ x: -this.offset });
-      }
+    if (this.cooldown || this.keyboardCoolDown) {
+       return; 
     }
-    return {};
+
+    setTimeout(() => {
+      this.keyboardCoolDown = true;
+    }, 0);
+
+    setTimeout(() => {
+      this.keyboardCoolDown = false;
+    }, 250);
+
+    switch (e.which) {
+      default:
+      case 38:
+      case 87: return setTimeout(() => { this.move({ y: -this.offset })}, 0);
+      case 39:
+      case 68: return setTimeout(() => { this.move({ x: this.offset })}, 0);
+      case 40:
+      case 83: return setTimeout(() => { this.move({ y: this.offset })}, 0);
+      case 37:
+      case 65: return setTimeout(() => { this.move({ x: -this.offset })}, 0);
+    }
   };
 
   maybeKeepMoving = (current, backwardsKey) => {
@@ -104,7 +111,8 @@ export default class UserNode extends React.Component {
       } else if (newYposStr !== oldYposStr) {
         this.move({ y: +newYposStr < +oldYposStr ? -this.offset : this.offset });
       }
-    }
+    } 
+    this.cooldown = false;
   };
 
   move = translation => {
@@ -116,8 +124,6 @@ export default class UserNode extends React.Component {
 
     if (this.nodeMap[currentKey][newKey]) {
       const completion = () => {
-        this.keyboardCoolDown = false;
-        this.cooldown = false;
         self.x = nextX;
         self.y = nextY;
         if (newKey === self.destNodeKey) {
