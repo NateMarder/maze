@@ -2,8 +2,10 @@
   "name": "maze",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://natemarder.github.io",
   "dependencies": {
     "eventemitter2": "^5.0.1",
+    "gh-pages": "^2.0.1",
     "graphology": "^0.14.1",
     "graphology-shortest-path": "^1.0.4",
     "keysim": "^2.1.0",
@@ -12,6 +14,7 @@
     "react-dom": "^16.8.6",
     "react-easy-swipe": "0.0.18",
     "react-scripts": "3.0.1",
+    "serve": "^11.1.0",
     "velocity-animate": "^1.5.2",
     "velocity-react": "^1.4.1"
   },
@@ -19,7 +22,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "airbnb-base",
