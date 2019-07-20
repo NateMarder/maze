@@ -6,6 +6,7 @@
     "eventemitter2": "^5.0.1",
     "graphology": "^0.14.1",
     "graphology-shortest-path": "^1.0.4",
+    "keysim": "^2.1.0",
     "lodash": "^4.17.14",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",

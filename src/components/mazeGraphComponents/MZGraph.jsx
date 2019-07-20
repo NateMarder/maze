@@ -97,6 +97,7 @@ export default class MZGraph extends React.Component {
         destnodekey={`${this.state.destNodeX}.${this.state.destNodeY}`}
         offset={DEFAULTS.desktopSpacing}
         mzgraphref={this.mazeGraphRef}
+        handleswipebindings={this.props.handleswipebindings}
       />
   );
 

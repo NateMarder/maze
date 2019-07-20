@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-param-reassign */
 
 import React from 'react';
@@ -35,41 +36,18 @@ export default class UserNode extends React.Component {
             self.keyboardCoolDown = false;
             self.x = x;
             self.y = y;
-          }
+          },
         },
         o: {
           duration: 750,
-        }
+        },
       });
     }, 1550);
   };
 
-  componentDidMount = () => {
-    this.x = this.props.cx;
-    this.y = this.props.cy;
-    this.startNodeKey = `${this.x}.${this.y}`;
-    this.startX = parseInt(this.x, 10);
-    this.startY = parseInt(this.y, 10);
-    this.r = this.props.r;
-    this.destNodeKey = this.props.destnodekey;
-    this.map = this.props.map;
-    this.offset = this.props.offset;
-    this.userNodeRef.current.focus(); // makes keyboard listener work immediately
-  };
-
-  componentDidUpdate = () => {
-    this.props.map.forEach(n => {
-      const sibs = {};
-      n.siblingKeys.forEach(k => sibs[k] = 1);
-      this.nodeMap[n.key] = sibs;
-    });
-    this.destNodeKey = this.props.destnodekey;
-    this.mzGraphRef = this.props.mzgraphref;
-  };
-
-  keyboardListener = e => {
+  keyboardListener = (e) => {
     if (this.cooldown || this.keyboardCoolDown) {
-       return; 
+      return;
     }
 
     setTimeout(() => {
@@ -80,16 +58,21 @@ export default class UserNode extends React.Component {
       this.keyboardCoolDown = false;
     }, 250);
 
+    // UP: 38,
+    // DOWN: 40,
+    // RIGHT: 39,
+    // LEFT: 37,
+
     switch (e.which) {
       default:
       case 38:
-      case 87: return setTimeout(() => { this.move({ y: -this.offset })}, 0);
-      case 39:
-      case 68: return setTimeout(() => { this.move({ x: this.offset })}, 0);
+      case 87: return this.move({ y: -this.offset });
       case 40:
-      case 83: return setTimeout(() => { this.move({ y: this.offset })}, 0);
+      case 83: return this.move({ y: this.offset });
+      case 39:
+      case 68: return this.move({ x: this.offset });
       case 37:
-      case 65: return setTimeout(() => { this.move({ x: -this.offset })}, 0);
+      case 65: return this.move({ x: -this.offset });
     }
   };
 
@@ -97,7 +80,7 @@ export default class UserNode extends React.Component {
     const siblingKeys = Object.keys(this.nodeMap[current]);
     if (siblingKeys.length === 2) {
       let nextKey = null;
-      siblingKeys.forEach(key => {
+      siblingKeys.forEach((key) => {
         if (key !== backwardsKey) {
           nextKey = key;
         }
@@ -111,11 +94,11 @@ export default class UserNode extends React.Component {
       } else if (newYposStr !== oldYposStr) {
         this.move({ y: +newYposStr < +oldYposStr ? -this.offset : this.offset });
       }
-    } 
+    }
     this.cooldown = false;
   };
 
-  move = translation => {
+  move = (translation) => {
     const currentKey = `${this.x}.${this.y}`;
     const nextX = (translation.x || 0) + this.x;
     const nextY = (translation.y || 0) + this.y;
@@ -148,11 +131,35 @@ export default class UserNode extends React.Component {
     }
   };
 
-  render = () => {
-    return (
+  componentDidMount = () => {
+    this.x = this.props.cx;
+    this.y = this.props.cy;
+    this.startNodeKey = `${this.x}.${this.y}`;
+    this.startX = parseInt(this.x, 10);
+    this.startY = parseInt(this.y, 10);
+    this.r = this.props.r;
+    this.destNodeKey = this.props.destnodekey;
+    this.map = this.props.map;
+    this.offset = this.props.offset;
+    this.props.handleswipebindings(this.keyboardListener);
+    this.userNodeRef.current.focus(); // makes keyboard listener work immediately
+  };
+
+  componentDidUpdate = () => {
+    this.props.map.forEach((n) => {
+      const sibs = {};
+      // eslint-disable-next-line no-return-assign
+      n.siblingKeys.forEach(k => sibs[k] = 1);
+      this.nodeMap[n.key] = sibs;
+    });
+    this.destNodeKey = this.props.destnodekey;
+    this.mzGraphRef = this.props.mzgraphref;
+  };
+
+  render = () => (
       <circle
         ref={this.userNodeRef}
-        onKeyDown={this.keyboardListener}
+        onKeyDown={e => this.keyboardListener(e)}
         onBlur={() => {
           this.userNodeRef.current.focus();
         }}
@@ -166,6 +173,21 @@ export default class UserNode extends React.Component {
         offset={this.offset}
         mzgraphref={this.mzGraphRef}
       />
-    );
-  };
+  );
 }
+
+
+// available properties
+
+// tagName: PropTypes.string,
+// className: PropTypes.string,
+// style: PropTypes.object,
+// children: PropTypes.node,
+// allowMouseEvents: PropTypes.bool,
+// onSwipeUp: PropTypes.func,
+// onSwipeDown: PropTypes.func,
+// onSwipeLeft: PropTypes.func,
+// onSwipeRight: PropTypes.func,
+// onSwipeStart: PropTypes.func,
+// onSwipeMove: PropTypes.func,
+// onSwipeEnd: PropTypes.func

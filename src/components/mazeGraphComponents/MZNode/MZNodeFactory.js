@@ -18,22 +18,22 @@ export default class MazeNodeFactory {
             y,
             isStart,
             isDest,
-            discoveredBy
-          })
+            discoveredBy,
+          }),
         );
       }
     }
     return arrayOfNodes;
   };
 
-  removeAllSiblings = nodes => {
-    nodes.forEach(val => {
+  removeAllSiblings = (nodes) => {
+    nodes.forEach((val) => {
       // eslint-disable-next-line no-param-reassign
       val.siblingKeys = null;
     });
   };
 
-  addSiblings = params => {
+  addSiblings = (params) => {
     const { rows, cols, spacing, nodeArray } = params;
 
     let x1;
@@ -89,7 +89,7 @@ export default class MazeNodeFactory {
       rows,
       cols,
       spacing,
-      nodeArray
+      nodeArray,
     });
   }
 }
