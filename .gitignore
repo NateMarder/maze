@@ -19,3 +19,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# old version of the application has some useful logic
+# but it doesn't all work so lets not commit
+/legacy

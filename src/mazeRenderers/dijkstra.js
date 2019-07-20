@@ -36,7 +36,7 @@ export default class Dijkstra {
 
   refreshData = () => {
     this.prepareDataSetFromOgData();
-    this.nodeArray.forEach(node => {
+    this.nodeArray.forEach((node) => {
       this.q.push({
         isVisited: false,
         key: node.key,
@@ -45,12 +45,12 @@ export default class Dijkstra {
         distKnown: node.isStart,
         siblingKeys: node.siblingKeys,
         currIndex: node.isStart ? 0 : -1,
-        minPathNeighbor: node.isStart ? null : 'uknown'
+        minPathNeighbor: node.isStart ? null : 'uknown',
       });
     });
   };
 
-  translateToPath = minpathData => {
+  translateToPath = (minpathData) => {
     const nodeArray = [];
     let nextNode = minpathData[+this.destKey];
     while (typeof nextNode !== 'undefined') {
@@ -94,7 +94,7 @@ export default class Dijkstra {
       isDest: false,
       distKnown: true,
       siblingKeys: start.siblingKeys,
-      minPathNeighbor: null
+      minPathNeighbor: null,
     };
     let priorityNode = priorityQue[this.startKey];
     let destNodeFound = false;
@@ -111,7 +111,7 @@ export default class Dijkstra {
             isDest: ogSibling.isDest,
             distKnown: false,
             siblingKeys: _.clone(ogSibling.siblingKeys),
-            minPathNeighbor: 'uknown'
+            minPathNeighbor: 'uknown',
           };
           destNodeFound = ogSibling.isDest;
         }
@@ -130,7 +130,7 @@ export default class Dijkstra {
       priorityQue[lastPriorityNode.key] = null;
       let itemsInPriorityQue = 0;
 
-      _.keys(priorityQue).forEach(k => {
+      _.keys(priorityQue).forEach((k) => {
         console.log(`priorityQue forEach k: ${k}`);
         itemsInPriorityQue += 1;
         if (priorityQue[k] && priorityQue[k].distFromStart < 9999) {
@@ -166,7 +166,7 @@ export default class Dijkstra {
       const nextMinPathObject = {
         start: isStart,
         self: priorityNode.key,
-        from: isStart ? null : fromKey
+        from: isStart ? null : fromKey,
       };
       this.minPathsToStart[priorityNode.key] = nextMinPathObject;
       paths.push(nextMinPathObject);
@@ -184,7 +184,7 @@ export default class Dijkstra {
       isDest: false,
       distKnown: true,
       siblingKeys: start.siblingKeys,
-      minPathNeighbor: null
+      minPathNeighbor: null,
     };
     let priorityNode = priorityQue[this.startKey];
     let destNodeFound = false;
@@ -201,7 +201,7 @@ export default class Dijkstra {
             isDest: this.q[sibIndexInQ].isDest,
             distKnown: false,
             siblingKeys: this.q[sibIndexInQ].siblingKeys,
-            minPathNeighbor: 'uknown'
+            minPathNeighbor: 'uknown',
           };
           if (ogSibling.isDest) {
             destNodeFound = true;
@@ -225,7 +225,7 @@ export default class Dijkstra {
       priorityQue[lastPriorityNode.key] = null;
       let itemsInPriorityQue = 0;
 
-      _.keys(priorityQue).forEach(key => {
+      _.keys(priorityQue).forEach((key) => {
         itemsInPriorityQue += 1;
         if (priorityQue[key] && priorityQue[key].distFromStart < this.maxdist) {
           priorityNode = priorityQue[key];
@@ -253,7 +253,7 @@ export default class Dijkstra {
       const nextMinPathObject = {
         start: isStart,
         self: priorityNode.key,
-        from: fromKey
+        from: fromKey,
       };
       this.minPathsToStart[priorityNode.key] = nextMinPathObject;
       paths.push(nextMinPathObject);

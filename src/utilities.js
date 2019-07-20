@@ -1,9 +1,7 @@
-export const getScreenDimensions = () => {
-  return {
-    height: window.innerHeight,
-    width: window.innerWidth,
-  };
-};
+export const getScreenDimensions = () => ({
+  height: window.innerHeight,
+  width: window.innerWidth,
+});
 
 export const mazeGraphDefaults = {
   desktopSpacing: 60,
@@ -106,7 +104,7 @@ export const getOrthogonalKeyForMazeRendering = (x1, y1, x2, y2) => {
   return returnString;
 };
 
-export const shuffle = array => {
+export const shuffle = (array) => {
   const buffer = array;
   for (let i = array.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));

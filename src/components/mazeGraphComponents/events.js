@@ -1,4 +1,4 @@
-import { getInstance } from '../../../events/index';
+import { getInstance } from '../../events/index';
 
 export const eventServer = getInstance();
 
@@ -6,8 +6,8 @@ export const events = {
   MAZEGAME: {
     GAMESTART: 'MZGAME::START',
     DESTFOUND: 'MZGAME::DESTFOUND',
-    GAMEOVER: 'MZGAME::GAMEOVER'
-  }
+    GAMEOVER: 'MZGAME::GAMEOVER',
+  },
 };
 
 /** UserControl Node Events */

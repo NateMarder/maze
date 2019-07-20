@@ -1,3 +1,6 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-restricted-syntax */
+
 function dijkstra(maze) {
   this.maxdist = 999999;
   this.startNodeIndex = -1;
@@ -11,7 +14,7 @@ dijkstra.prototype.refreshData = () => {
   this.minPathsToStart = {};
   let index = 0;
   this.maxQueSize = 0;
-  this.maze.nodes.forEach(nodes => {
+  this.maze.nodes.forEach((nodes, key) => {
     const nextNode = nodes[key];
     let dist = nextNode.isStart ? 0 : this.maxdist;
     let isDest = false;
@@ -42,7 +45,7 @@ dijkstra.prototype.refreshData = () => {
       distKnown,
       siblingKeys,
       currIndex,
-      minPathNeighbor
+      minPathNeighbor,
     });
 
     index += 1;
@@ -50,7 +53,7 @@ dijkstra.prototype.refreshData = () => {
   });
 };
 
-dijkstra.prototype.translateToPath = minpathData => {
+dijkstra.prototype.translateToPath = (minpathData) => {
   const nodeArray = [];
   let nextNode = minpathData[+this.destKey];
   while (typeof nextNode !== 'undefined') {
@@ -65,7 +68,7 @@ dijkstra.prototype.run = () => {
     return this.solution;
   }
   this.refreshData();
-  const nodes = this.maze.nodes;
+  const { nodes } = this.maze;
   for (const key in nodes) {
     if (nodes.hasOwnProperty(key)) {
       nodes[key].isVisited = false;
@@ -99,7 +102,7 @@ dijkstra.prototype.runAlgorithm = () => {
     isDest: false,
     distKnown: true,
     siblingKeys: start.siblingKeys,
-    minPathNeighbor: null
+    minPathNeighbor: null,
   };
   let priorityNode = priorityQue[this.startKey];
   let destNodeFound = false;
@@ -116,7 +119,7 @@ dijkstra.prototype.runAlgorithm = () => {
           isDest: this.q[sibIndexInQ].isDest,
           distKnown: false,
           siblingKeys: this.q[sibIndexInQ].siblingKeys,
-          minPathNeighbor: 'uknown'
+          minPathNeighbor: 'uknown',
         };
         if (ogSibling.isDest) {
           destNodeFound = true;
@@ -172,7 +175,7 @@ dijkstra.prototype.runAlgorithm = () => {
     const nextMinPathObject = {
       start: isStart,
       self: priorityNode.key,
-      from: fromKey
+      from: fromKey,
     };
     this.minPathsToStart[priorityNode.key] = nextMinPathObject;
     paths.push(nextMinPathObject);

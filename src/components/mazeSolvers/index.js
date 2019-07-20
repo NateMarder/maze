@@ -1,3 +1,3 @@
 import dfs from './dfs';
 
-export default { mazeSolver: dfs }
+export default { mazeSolver: dfs };

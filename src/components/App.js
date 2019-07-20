@@ -1,13 +1,11 @@
 import React from 'react';
-import GameContainer from './maze/containers/GameContainer';
+import GameContainer from './containers/GameContainer';
 import './App.css';
 
-export default class App extends React.Component {
-  render = () => {
-    return (
-      <div className="column">
-        <GameContainer />
-      </div>
-    );
-  };
-}
+const App = () => (
+  <div className="column">
+    <GameContainer />
+  </div>
+);
+
+export default App;

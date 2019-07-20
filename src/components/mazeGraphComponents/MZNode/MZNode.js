@@ -1,5 +1,5 @@
 export default class MZNode {
-  constructor({x, y, isStart, isDest, disoveredBy}) {
+  constructor({ x, y, isStart, isDest, disoveredBy }) {
     this.key = `${+x}.${+y}`;
     this.isVisited = false;
     this.isDest = isDest;
