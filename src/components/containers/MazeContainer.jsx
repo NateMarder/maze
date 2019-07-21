@@ -5,11 +5,7 @@ import SettingsRow from '../settings/SettingsRow';
 import { KEYCODEMAP } from '../../utilities/keyboardEventHelper';
 
 export default class MazeContainer extends React.Component {
-  state = {
-    windowHeight: window.innerHeight,
-    windowWidth: window.innerWidth,
-    synthClick: null,
-  };
+  state = {};
 
   componentDidMount = () => {
     this.setState({
@@ -32,6 +28,7 @@ export default class MazeContainer extends React.Component {
     onSwipeLeft: () => this.state.synthClick({ which: KEYCODEMAP.LEFT }),
     onSwipeRight: () => this.state.synthClick({ which: KEYCODEMAP.RIGHT }),
     onSwipeMove: () => true,
+    allowMouseEvents: true,
   });
 
   render() {

@@ -52,16 +52,10 @@ export default class UserNode extends React.Component {
 
     setTimeout(() => {
       this.keyboardCoolDown = true;
+      setTimeout(() => {
+        this.keyboardCoolDown = false;
+      }, 250);
     }, 0);
-
-    setTimeout(() => {
-      this.keyboardCoolDown = false;
-    }, 250);
-
-    // UP: 38,
-    // DOWN: 40,
-    // RIGHT: 39,
-    // LEFT: 37,
 
     switch (e.which) {
       default:
@@ -91,7 +85,7 @@ export default class UserNode extends React.Component {
 
       if (newXposStr !== oldXposStr) {
         this.move({ x: +newXposStr < +oldXposStr ? -this.offset : this.offset });
-      } else if (newYposStr !== oldYposStr) {
+      } else {
         this.move({ y: +newYposStr < +oldYposStr ? -this.offset : this.offset });
       }
     }
@@ -126,7 +120,10 @@ export default class UserNode extends React.Component {
       Velocity.animate({
         e: self.userNodeRef.current,
         p: { cx: nextX, cy: nextY, completion },
-        o: { duration: 50 },
+        o: {
+          duration: 50,
+          easing: 'linear',
+        },
       });
     }
   };
@@ -168,26 +165,6 @@ export default class UserNode extends React.Component {
         cy={this.y}
         r={this.r}
         tabIndex="0"
-        map={this.map}
-        destnodekey={this.destNodeKey}
-        offset={this.offset}
-        mzgraphref={this.mzGraphRef}
       />
   );
 }
-
-
-// available properties
-
-// tagName: PropTypes.string,
-// className: PropTypes.string,
-// style: PropTypes.object,
-// children: PropTypes.node,
-// allowMouseEvents: PropTypes.bool,
-// onSwipeUp: PropTypes.func,
-// onSwipeDown: PropTypes.func,
-// onSwipeLeft: PropTypes.func,
-// onSwipeRight: PropTypes.func,
-// onSwipeStart: PropTypes.func,
-// onSwipeMove: PropTypes.func,
-// onSwipeEnd: PropTypes.func
