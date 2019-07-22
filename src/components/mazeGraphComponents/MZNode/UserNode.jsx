@@ -50,11 +50,11 @@ export default class UserNode extends React.Component {
       return;
     }
 
+    console.log(`keyboard input detected. e.which = ${e.which}`);
+
     setTimeout(() => {
       this.keyboardCoolDown = true;
-      setTimeout(() => {
-        this.keyboardCoolDown = false;
-      }, 250);
+      setTimeout(() => { this.keyboardCoolDown = false; }, 250);
     }, 0);
 
     switch (e.which) {

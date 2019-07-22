@@ -2,9 +2,10 @@ import React from 'react';
 import Swipe from 'react-easy-swipe';
 import MazeGraph from '../mazeGraphComponents/MZGraph';
 import SettingsRow from '../settings/SettingsRow';
-import { KEYCODEMAP } from '../../utilities/keyboardEventHelper';
 
 export default class MazeContainer extends React.Component {
+  cooldown = false;
+
   state = {};
 
   componentDidMount = () => {
@@ -22,11 +23,36 @@ export default class MazeContainer extends React.Component {
     }
   }
 
+  handleCoolDown = () => {
+    this.cooldown = true;
+    setTimeout(() => { this.cooldown = false; }, 250);
+  }
+
   getSwipeProps = () => ({
-    onSwipeUp: () => this.state.synthClick({ which: KEYCODEMAP.UP }),
-    onSwipeDown: () => this.state.synthClick({ which: KEYCODEMAP.DOWN }),
-    onSwipeLeft: () => this.state.synthClick({ which: KEYCODEMAP.LEFT }),
-    onSwipeRight: () => this.state.synthClick({ which: KEYCODEMAP.RIGHT }),
+    onSwipeUp: () => {
+      if (!this.cooldown) {
+        this.handleCoolDown();
+        this.state.synthClick({ which: 38 });
+      }
+    },
+    onSwipeDown: () => {
+      if (!this.cooldown) {
+        this.handleCoolDown();
+        this.state.synthClick({ which: 40 });
+      }
+    },
+    onSwipeLeft: () => {
+      if (!this.cooldown) {
+        this.handleCoolDown();
+        this.state.synthClick({ which: 37 });
+      }
+    },
+    onSwipeRight: () => {
+      if (!this.cooldown) {
+        this.handleCoolDown();
+        this.state.synthClick({ which: 39 });
+      }
+    },
     onSwipeMove: () => true,
     allowMouseEvents: true,
   });
