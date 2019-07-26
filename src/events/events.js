@@ -1,4 +1,4 @@
-import { getInstance } from '../../events/index';
+import { getInstance } from './index';
 
 export const eventServer = getInstance();
 

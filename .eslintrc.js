@@ -11,6 +11,7 @@ module.exports = {
     node: 2,
     jquery: 2,
   },
+  "plugins": ["react-hooks"],
   rules: {
     "import/no-unresolved": 0,
     "class-methods-use-this": 0,
@@ -27,7 +28,10 @@ module.exports = {
     "strict": [0, "never",],
     "vars-on-top": 2,
     "object-curly-newline": 0,
-    "no-multi-assign": 0
+    "no-multi-assign": 0,
+    "react-hooks/rules-of-hooks": 'error',
+    "react-hooks/exhaustive-deps": 'warn',
+    "no-console": 0,
   },
   globals: {
     document: 0,

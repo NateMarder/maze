@@ -1,8 +1,6 @@
 import React from 'react';
 import MazeContainer from './MazeContainer';
 
-export default class GameContainer extends React.Component {
-  render() {
-    return <MazeContainer />;
-  }
-}
+const GameContainer = () => <MazeContainer />;
+
+export default GameContainer;

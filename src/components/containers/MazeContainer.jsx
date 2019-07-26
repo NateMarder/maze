@@ -1,7 +1,7 @@
 import React from 'react';
 import Swipe from 'react-easy-swipe';
-import MazeGraph from '../mazeGraphComponents/MZGraph';
-import SettingsRow from '../settings/SettingsRow';
+import MazeGraph from '../mazeGraph/MazeGraph';
+import SettingsRow from '../SettingsRow';
 
 export default class MazeContainer extends React.Component {
   cooldown = false;

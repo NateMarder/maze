@@ -1,18 +1,18 @@
 import React from 'react';
 import _ from 'lodash';
 import { mazeGraphDefaults as DEFAULTS } from '../../utilities';
-import { MazeNodeFactory, UserNode } from './MZNode/index';
-import DestNode from '../mazeGraphComponents/DestNode';
+import { MazeNodeFactory, UserNode } from './MazeNode/index';
+import DestinationNode from './DestinationNode';
 import { MazePathFactory } from './MazePath';
-import { MZWall, MazeWallFactory } from './MZWall';
+import { MazeWall, MazeWallFactory } from './MazeWall/index';
 import { LevelOne } from '../../mazeRenderers/index';
 
-export default class MZGraph extends React.Component {
-  constructor(props) {
-    super(props);
+export default class MazeGraph extends React.Component {
+  constructor({ height, width }) {
+    super({ height, width });
     this.state = {
-      height: this.props.height,
-      width: this.props.width,
+      height,
+      width,
       spacing: DEFAULTS.desktopSpacing,
       cols: 0,
       rows: 0,
@@ -28,14 +28,14 @@ export default class MZGraph extends React.Component {
 
   componentDidMount = () => {
     this.setState((prevState, props) => ({
-      cols: Math.floor((props.width * 0.80) / prevState.spacing),
-      rows: Math.floor((props.height * 0.80) / prevState.spacing),
+      cols: Math.floor((props.width * 0.80) / DEFAULTS.desktopSpacing),
+      rows: Math.floor((props.height * 0.80) / DEFAULTS.desktopSpacing),
       currentLevel: this.currentLevel || 1,
     }));
 
     this.setState(prevState => ({
-      width: prevState.spacing * prevState.cols,
-      height: prevState.spacing * prevState.rows,
+      width: DEFAULTS.desktopSpacing * prevState.cols,
+      height: DEFAULTS.desktopSpacing * prevState.rows,
     }));
 
     this.setState(prevState => ({
@@ -54,7 +54,7 @@ export default class MZGraph extends React.Component {
     });
 
     this.setState(prevState => ({
-      walls: new MazeWallFactory().getWalls(prevState),
+      walls: new MazeWallFactory(prevState),
     }), () => {
       this.setState(prevState => ({
         allPaths: new MazePathFactory().getPathsWithInactiveWalls(prevState),
@@ -103,17 +103,18 @@ export default class MZGraph extends React.Component {
 
   getInnerWalls = () => this.state.walls.map((wall) => {
     const { id, x1, y1, x2, y2 } = wall;
-    return (<MZWall key={id} id={id} x1={x1} y1={y1} x2={x2} y2={y2} className="mz-wall insidewall" />);
+    return (<MazeWall key={id} id={id} x1={x1} y1={y1} x2={x2} y2={y2} className="mz-wall insidewall" />);
   });
 
-  getOutterWalls = () => (
-      <React.Fragment>
-        <MZWall x1={0} y1={0} x2={0} y2={this.state.height} className="outsidewall" />
-        <MZWall x1={0} y1={0} x2={this.state.width} y2={0} className="outsidewall" />
-        <MZWall x1={this.state.width} y1={0} x2={this.state.width} y2={this.state.height} className="outsidewall" />
-        <MZWall x1={0} y1={this.state.height} x2={this.state.width} y2={this.state.height} className="outsidewall" />
-      </React.Fragment>
-  );
+  getOutterWalls = () => {
+    const { height, width } = this.state;
+    return <>
+      <MazeWall x1={0} y1={0} x2={0} y2={height} className="outsidewall" />
+      <MazeWall x1={0} y1={0} x2={width} y2={0} className="outsidewall" />
+      <MazeWall x1={width} y1={0} x2={width} y2={height} className="outsidewall" />
+      <MazeWall x1={0} y1={height} x2={width} y2={height} className="outsidewall" />
+    </>;
+  };
 
   render = () => (
       <div ref={this.mazeGraphRef}>
@@ -121,7 +122,7 @@ export default class MZGraph extends React.Component {
           {this.getOutterWalls()}
           {this.getInnerWalls()}
           {this.getUserControlNode()}
-          <DestNode
+          <DestinationNode
             x={this.state.destNodeX}
             y={this.state.destNodeY}
             r={Math.round(DEFAULTS.desktopSpacing * 0.10)}

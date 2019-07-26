@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import MZNode from './MZNode';
+import MZNode from './MazeNode';
 
 export default class MazeNodeFactory {
   buildNodeArray = ({ rows, cols, spacing }) => {
@@ -7,18 +7,13 @@ export default class MazeNodeFactory {
     const offset = spacing / 2;
     for (let i = 0; i < cols; i += 1) {
       for (let j = 0; j < rows; j += 1) {
-        const x = i * spacing + offset;
-        const y = j * spacing + offset;
-        const isStart = i + j === 0;
-        const isDest = i === cols - 1 && j === rows - 1;
-        const discoveredBy = '';
         arrayOfNodes.push(
           new MZNode({
-            x,
-            y,
-            isStart,
-            isDest,
-            discoveredBy,
+            x: i * spacing + offset,
+            y: j * spacing + offset,
+            isStart: i + j === 0,
+            isDest: i === cols - 1 && j === rows - 1,
+            discoveredBy: '',
           }),
         );
       }
@@ -26,16 +21,7 @@ export default class MazeNodeFactory {
     return arrayOfNodes;
   };
 
-  removeAllSiblings = (nodes) => {
-    nodes.forEach((val) => {
-      // eslint-disable-next-line no-param-reassign
-      val.siblingKeys = null;
-    });
-  };
-
-  addSiblings = (params) => {
-    const { rows, cols, spacing, nodeArray } = params;
-
+  addSiblings = ({ rows, cols, spacing, nodeArray }) => {
     let x1;
     let x2;
     let y1;
@@ -44,36 +30,25 @@ export default class MazeNodeFactory {
     const r2 = Math.round(r / 2);
     for (let i = 0; i < cols; i += 1) {
       for (let j = 0; j < rows - 1; j += 1) {
-        x2 = i * r;
-        x1 = x2;
-        y1 = j * r;
+        const x = i * r + r2;
+        y1 = j * r + r2;
         y2 = y1 + r;
-        x1 += r2;
-        x2 += r2;
-        y1 += r2;
-        y2 += r2;
-        this.bindNodes([`${x1}.${y1}`, `${x2}.${y2}`], nodeArray);
+        this.bindNodes([`${x}.${y1}`, `${x}.${y2}`], nodeArray);
       }
     }
     for (let i = 0; i < rows; i += 1) {
       for (let j = 0; j < cols - 1; j += 1) {
-        y2 = i * r;
-        y1 = y2;
-        x1 = j * r;
+        const y = i * r + r2;
+        x1 = j * r + r2;
         x2 = x1 + r;
-        x1 += r2;
-        x2 += r2;
-        y1 += r2;
-        y2 += r2;
-        this.bindNodes([`${x1}.${y1}`, `${x2}.${y2}`], nodeArray);
+        this.bindNodes([`${x1}.${y}`, `${x2}.${y}`], nodeArray);
       }
     }
 
     return nodeArray;
   };
 
-  bindNodes = (nodeKeys, nodeArray) => {
-    const [key1, key2] = nodeKeys;
+  bindNodes = ([key1, key2], nodeArray) => {
     const nodeRef1 = _.find(nodeArray, n => n.key === key1);
     const nodeRef2 = _.find(nodeArray, n => n.key === key2);
 

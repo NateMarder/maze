@@ -3,9 +3,9 @@
 
 import React from 'react';
 import Velocity from 'velocity-animate';
-import { eventServer, events } from '../events';
+import { eventServer, events } from '../../events/events';
 
-export default class UserNode extends React.Component {
+export default class PlayerNode extends React.Component {
   constructor(props) {
     super(props);
     this.userNodeRef = React.createRef();
