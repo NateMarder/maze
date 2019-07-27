@@ -1,23 +1,20 @@
-/* eslint-disable consistent-return */
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-use-before-define, prefer-const, consistent-return,
+  no-param-reassign, react-hooks/exhaustive-deps, no-return-assign, prefer-destructuring */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Velocity from 'velocity-animate';
 import { eventServer, events } from '../../events/events';
 
-export default class PlayerNode extends React.Component {
-  constructor(props) {
-    super(props);
-    this.userNodeRef = React.createRef();
-    this.nodeMap = {};
-    this.cooldown = false;
-    this.keyboardCoolDown = false;
-    this.mzGraphRef = null;
-  }
+const PlayerNode = (props) => {
+  let userNodeRef = React.createRef();
+  let nodeMap = {};
+  let [cooldown, keyboardCoolDown, keyIsDown] = [false, false, false];
+  let { cx, cy, r, offset, map, handleswipebindings, destnodekey, mzgraphref } = props;
+  const startX = cx;
+  const startY = cy;
 
-  sendPlayerHome = ({ x, y, self, graph }) => {
-    self.cooldown = true;
-    self.keyboardCoolDown = true;
+  const sendPlayerHome = ({ x, y, self, graph }) => {
+    cooldown = true;
 
     const spinTheBoard = {
       e: graph.current,
@@ -26,49 +23,24 @@ export default class PlayerNode extends React.Component {
     };
 
     const sendPlayerBackToStart = {
-      e: self.userNodeRef.current,
+      e: userNodeRef.current,
       p: { cx: x, cy: y },
-      o: { easing: 'spring', duration: 500 },
+      o: { duration: 'slow' },
     };
 
     // uses promises to run animations sequentially
     Velocity.animate(spinTheBoard)
       .then(() => { Velocity.animate(sendPlayerBackToStart); })
       .then(() => {
-        self.cooldown = false;
-        self.keyboardCoolDown = false;
-        self.x = x;
-        self.y = y;
+        cooldown = false;
+        keyboardCoolDown = false;
+        cx = x;
+        cy = y;
       });
   };
 
-  keyboardListener = (e) => {
-    if (this.cooldown || this.keyboardCoolDown) {
-      return;
-    }
-
-    console.log(`keyboard input detected. e.which = ${e.which}`);
-
-    setTimeout(() => {
-      this.keyboardCoolDown = true;
-      setTimeout(() => { this.keyboardCoolDown = false; }, 250);
-    }, 0);
-
-    switch (e.which) {
-      default:
-      case 38:
-      case 87: return this.move({ y: -this.offset });
-      case 40:
-      case 83: return this.move({ y: this.offset });
-      case 39:
-      case 68: return this.move({ x: this.offset });
-      case 37:
-      case 65: return this.move({ x: -this.offset });
-    }
-  };
-
-  determineNextMove = (current, backwardsKey) => {
-    const siblingKeys = Object.keys(this.nodeMap[current]);
+  const determineNextMove = (current, backwardsKey) => {
+    const siblingKeys = Object.keys(nodeMap[current]);
     if (siblingKeys.length !== 2) {
       return;
     }
@@ -78,41 +50,44 @@ export default class PlayerNode extends React.Component {
     const [oldX, oldY] = current.split('.').map(val => +val);
 
     if (newX !== oldX) {
-      this.move({ x: newX < oldX ? -this.offset : this.offset });
+      move({ x: newX < oldX ? -offset : offset });
     } else if (newY !== oldY) {
-      this.move({ y: newY < oldY ? -this.offset : this.offset });
+      move({ y: newY < oldY ? -offset : offset });
     }
 
-    this.cooldown = false;
+    cooldown = false;
   };
 
-  move = (translation) => {
-    const currentKey = `${this.x}.${this.y}`;
-    const nextX = (translation.x || 0) + this.x;
-    const nextY = (translation.y || 0) + this.y;
+  const move = (translation) => {
+    const currentKey = `${cx}.${cy}`;
+    const nextX = (translation.x || 0) + cx;
+    const nextY = (translation.y || 0) + cy;
     const newKey = `${nextX}.${nextY}`;
-    const self = this;
 
-    if (this.nodeMap[currentKey][newKey]) {
+    if (nodeMap[currentKey][newKey]) {
       const completion = () => {
-        self.x = nextX;
-        self.y = nextY;
-        if (newKey === self.destNodeKey) {
-          eventServer.emit(events.MAZEGAME.DESTFOUND,
-            { x: self.startX,
-              y: self.startY,
-              self,
-              graph: self.mzGraphRef,
-            },
-            self.sendPlayerHome);
+        cx = nextX;
+        cy = nextY;
+        if (newKey === destnodekey) {
+          const payload = {
+            x: startX,
+            y: startY,
+            self: userNodeRef,
+            graph: mzgraphref,
+          };
+          eventServer.emit(
+            events.MAZEGAME.DESTFOUND,
+            payload,
+            sendPlayerHome,
+          );
         } else {
-          self.determineNextMove(newKey, currentKey);
+          determineNextMove(newKey, currentKey);
         }
       };
 
       // animate
       Velocity.animate({
-        e: self.userNodeRef.current,
+        e: userNodeRef.current,
         p: { cx: nextX, cy: nextY, completion, translateZ: 0 },
         o: {
           duration: 50,
@@ -122,43 +97,52 @@ export default class PlayerNode extends React.Component {
     }
   };
 
-  componentDidMount = () => {
-    this.x = this.props.cx;
-    this.y = this.props.cy;
-    this.startNodeKey = `${this.x}.${this.y}`;
-    this.startX = parseInt(this.x, 10);
-    this.startY = parseInt(this.y, 10);
-    this.r = this.props.r;
-    this.destNodeKey = this.props.destnodekey;
-    this.map = this.props.map;
-    this.offset = this.props.offset;
-    this.props.handleswipebindings(this.keyboardListener);
-    this.userNodeRef.current.focus(); // makes keyboard listener work immediately
-  };
+  const keyboardListener = (e) => {
+    if (cooldown || keyboardCoolDown || keyIsDown) { return; }
 
-  componentDidUpdate = () => {
-    this.props.map.forEach((n) => {
-      const sibs = {};
-      // eslint-disable-next-line no-return-assign
-      n.siblingKeys.forEach(k => sibs[k] = 1);
-      this.nodeMap[n.key] = sibs;
+    setTimeout(() => {
+      keyboardCoolDown = true;
+      keyIsDown = true;
+      setTimeout(() => { keyboardCoolDown = false; }, 250);
     });
-    this.destNodeKey = this.props.destnodekey;
-    this.mzGraphRef = this.props.mzgraphref;
+
+    switch (e.which) {
+      default:
+      case 38:
+      case 87: return move({ y: -offset });
+      case 40:
+      case 83: return move({ y: offset });
+      case 39:
+      case 68: return move({ x: offset });
+      case 37:
+      case 65: return move({ x: -offset });
+    }
   };
 
-  render = () => (
-      <circle
-        ref={this.userNodeRef}
-        onKeyDown={e => this.keyboardListener(e)}
-        onBlur={() => {
-          this.userNodeRef.current.focus();
-        }}
-        className="mz-node user-node"
-        cx={this.x}
-        cy={this.y}
-        r={this.r}
-        tabIndex="0"
-      />
+  useEffect(() => {
+    if (!props.map) { return; }
+    if (!destnodekey) {
+      destnodekey = props.destnodekey;
+    }
+    handleswipebindings(keyboardListener);
+    userNodeRef.current.focus(); // makes keyboard listener work immediately
+    map.forEach((n) => {
+      const sibs = {};
+      n.siblingKeys.forEach(k => sibs[k] = 1);
+      nodeMap[n.key] = sibs;
+    });
+  }, [props.map]);
+
+  return (
+    <circle
+      ref={userNodeRef}
+      onKeyDown={(e) => { keyboardListener(e); }}
+      onKeyUp={() => { keyIsDown = false; }}
+      onBlur={() => { userNodeRef.current.focus(); }}
+      className="mz-node user-node"
+      cx={cx} cy={cy} r={r} tabIndex="0"
+    />
   );
-}
+};
+
+export default PlayerNode;

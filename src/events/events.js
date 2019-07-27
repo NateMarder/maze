@@ -11,8 +11,6 @@ export const events = {
 };
 
 /** UserControl Node Events */
-eventServer.on(events.MAZEGAME.DESTFOUND, (data, cb) => {
-  console.log(`${events.MAZEGAME.DESTFOUND} Event Fired`);
-  console.log(data);
-  cb(data);
+eventServer.on(events.MAZEGAME.DESTFOUND, (payLoad, cb) => {
+  cb(payLoad);
 });

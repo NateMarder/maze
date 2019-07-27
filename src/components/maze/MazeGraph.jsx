@@ -8,11 +8,11 @@ import { MazeWall, MazeWallFactory } from './wall/index';
 import { LevelOne } from '../../mazeRenderers/index';
 
 export default class MazeGraph extends React.Component {
-  constructor({ height, width }) {
-    super({ height, width });
+  constructor(props) {
+    super(props);
     this.state = {
-      height,
-      width,
+      height: props.height,
+      width: props.width,
       spacing: DEFAULTS.desktopSpacing,
       cols: 0,
       rows: 0,
