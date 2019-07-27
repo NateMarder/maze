@@ -1,6 +1,6 @@
 import React from 'react';
 import Swipe from 'react-easy-swipe';
-import MazeGraph from '../mazeGraph/MazeGraph';
+import MazeGraph from '../maze/MazeGraph';
 import SettingsRow from '../SettingsRow';
 
 export default class MazeContainer extends React.Component {

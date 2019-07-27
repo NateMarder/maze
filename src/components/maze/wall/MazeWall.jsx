@@ -1,5 +1,5 @@
-import React from 'react';
 import { filter, includes } from 'lodash';
+import React from 'react';
 
 export const MazeWall = ({ id, x1, y1, x2, y2 }) => <line id={id} className="mz-wall" x1={x1} y1={y1} x2={x2} y2={y2} />;
 

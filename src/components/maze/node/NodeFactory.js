@@ -1,14 +1,14 @@
 import _ from 'lodash';
-import MZNode from './MazeNode';
+import mazeNode from './MazeNode';
 
-export default class MazeNodeFactory {
+export default class NodeFactory {
   buildNodeArray = ({ rows, cols, spacing }) => {
     const arrayOfNodes = [];
     const offset = spacing / 2;
     for (let i = 0; i < cols; i += 1) {
       for (let j = 0; j < rows; j += 1) {
         arrayOfNodes.push(
-          new MZNode({
+          new mazeNode({
             x: i * spacing + offset,
             y: j * spacing + offset,
             isStart: i + j === 0,

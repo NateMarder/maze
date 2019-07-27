@@ -1,4 +1,4 @@
-export default class MZNode {
+export default class MazeNode {
   constructor({ x, y, isStart, isDest, disoveredBy }) {
     this.key = `${+x}.${+y}`;
     this.isVisited = false;

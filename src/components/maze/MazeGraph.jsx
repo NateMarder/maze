@@ -1,10 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
 import { mazeGraphDefaults as DEFAULTS } from '../../utilities';
-import { MazeNodeFactory, UserNode } from './MazeNode/index';
+import { NodeFactory, UserNode } from './node/index';
 import DestinationNode from './DestinationNode';
-import { MazePathFactory } from './MazePath';
-import { MazeWall, MazeWallFactory } from './MazeWall/index';
+import { pathFactory } from './path/index';
+import { MazeWall, MazeWallFactory } from './wall/index';
 import { LevelOne } from '../../mazeRenderers/index';
 
 export default class MazeGraph extends React.Component {
@@ -39,7 +39,7 @@ export default class MazeGraph extends React.Component {
     }));
 
     this.setState(prevState => ({
-      nodes: new MazeNodeFactory().getNodes(prevState),
+      nodes: new NodeFactory().getNodes(prevState),
     }));
 
     this.setState((prevState) => {
@@ -57,7 +57,7 @@ export default class MazeGraph extends React.Component {
       walls: new MazeWallFactory(prevState),
     }), () => {
       this.setState(prevState => ({
-        allPaths: new MazePathFactory().getPathsWithInactiveWalls(prevState),
+        allPaths: pathFactory.useInactiveWalls(prevState),
       }), () => {
         this.updateSiblingsUsingPaths();
       });

@@ -15,34 +15,31 @@ export default class PlayerNode extends React.Component {
     this.mzGraphRef = null;
   }
 
-  gohome = ({ x, y, self, graph }) => {
+  sendPlayerHome = ({ x, y, self, graph }) => {
     self.cooldown = true;
     self.keyboardCoolDown = true;
 
-    Velocity.animate({
+    const spinTheBoard = {
       e: graph.current,
-      p: { rotateZ: '-=1440' },
-      o: { duration: 1500 },
-    });
+      p: { rotateZ: '720deg' },
+      o: { duration: 1000 },
+    };
 
-    setTimeout(() => {
-      Velocity.animate({
-        e: self.userNodeRef.current,
-        p: {
-          cx: x,
-          cy: y,
-          completion: () => {
-            self.cooldown = false;
-            self.keyboardCoolDown = false;
-            self.x = x;
-            self.y = y;
-          },
-        },
-        o: {
-          duration: 750,
-        },
+    const sendPlayerBackToStart = {
+      e: self.userNodeRef.current,
+      p: { cx: x, cy: y },
+      o: { easing: 'spring', duration: 500 },
+    };
+
+    // uses promises to run animations sequentially
+    Velocity.animate(spinTheBoard)
+      .then(() => { Velocity.animate(sendPlayerBackToStart); })
+      .then(() => {
+        self.cooldown = false;
+        self.keyboardCoolDown = false;
+        self.x = x;
+        self.y = y;
       });
-    }, 1550);
   };
 
   keyboardListener = (e) => {
@@ -70,25 +67,22 @@ export default class PlayerNode extends React.Component {
     }
   };
 
-  maybeKeepMoving = (current, backwardsKey) => {
+  determineNextMove = (current, backwardsKey) => {
     const siblingKeys = Object.keys(this.nodeMap[current]);
-    if (siblingKeys.length === 2) {
-      let nextKey = null;
-      siblingKeys.forEach((key) => {
-        if (key !== backwardsKey) {
-          nextKey = key;
-        }
-      });
-
-      const [newXposStr, newYposStr] = nextKey.split('.');
-      const [oldXposStr, oldYposStr] = current.split('.');
-
-      if (newXposStr !== oldXposStr) {
-        this.move({ x: +newXposStr < +oldXposStr ? -this.offset : this.offset });
-      } else {
-        this.move({ y: +newYposStr < +oldYposStr ? -this.offset : this.offset });
-      }
+    if (siblingKeys.length !== 2) {
+      return;
     }
+
+    const nextKey = siblingKeys.find(k => k !== backwardsKey); // first index of non backwards key
+    const [newX, newY] = nextKey.split('.').map(val => +val);
+    const [oldX, oldY] = current.split('.').map(val => +val);
+
+    if (newX !== oldX) {
+      this.move({ x: newX < oldX ? -this.offset : this.offset });
+    } else if (newY !== oldY) {
+      this.move({ y: newY < oldY ? -this.offset : this.offset });
+    }
+
     this.cooldown = false;
   };
 
@@ -110,16 +104,16 @@ export default class PlayerNode extends React.Component {
               self,
               graph: self.mzGraphRef,
             },
-            self.gohome);
+            self.sendPlayerHome);
         } else {
-          self.maybeKeepMoving(newKey, currentKey);
+          self.determineNextMove(newKey, currentKey);
         }
       };
 
       // animate
       Velocity.animate({
         e: self.userNodeRef.current,
-        p: { cx: nextX, cy: nextY, completion },
+        p: { cx: nextX, cy: nextY, completion, translateZ: 0 },
         o: {
           duration: 50,
           easing: 'linear',
