@@ -7,25 +7,25 @@ import { eventServer, events } from '../../events/events';
 
 const PlayerNode = (props) => {
   let userNodeRef = React.createRef();
-  let nodeMap = {};
+  const nodeMap = {};
   let [cooldown, keyboardCoolDown, keyIsDown] = [false, false, false];
   let { cx, cy, r, offset, map, handleswipebindings, destnodekey, mzgraphref } = props;
-  const startX = cx;
-  const startY = cy;
+  const [startX, startY] = [cx, cy];
 
   const sendPlayerHome = ({ x, y, graph }) => {
     cooldown = true;
     const spinTheBoard = { e: graph.current, p: { rotateZ: '+=720' }, o: { duration: 'slow' } };
     const sendPlayerBackToStart = { e: userNodeRef.current, p: { cx: x, cy: y }, o: { duration: 'slow' } };
+    const putThingsBack = () => {
+      cooldown = false;
+      keyboardCoolDown = false;
+      cx = x;
+      cy = y;
+    };
 
     Velocity.animate(spinTheBoard)
       .then(() => { Velocity.animate(sendPlayerBackToStart); })
-      .then(() => {
-        cooldown = false;
-        keyboardCoolDown = false;
-        cx = x;
-        cy = y;
-      })
+      .then(putThingsBack)
       .catch(e => console.error(e));
   };
 
@@ -77,16 +77,16 @@ const PlayerNode = (props) => {
       }).catch(e => console.error(e));
   };
 
-  const keyboardListener = (e) => {
-    if (cooldown || keyboardCoolDown || keyIsDown) { return; }
+  const keyDownListener = ({ which }) => {
+    if (cooldown || keyboardCoolDown || keyIsDown) return;
 
     setTimeout(() => {
       keyboardCoolDown = true;
       keyIsDown = true;
       setTimeout(() => { keyboardCoolDown = false; }, 250);
-    });
+    }, 0);
 
-    switch (e.which) {
+    switch (which) {
       default:
       case 38:
       case 87: return move({ y: -offset });
@@ -100,26 +100,24 @@ const PlayerNode = (props) => {
   };
 
   useEffect(() => {
-    if (!props.map) { return; }
+    if (!map) { return; }
+
     destnodekey = props.destnodekey;
-    handleswipebindings(keyboardListener);
+    handleswipebindings(keyDownListener);
     userNodeRef.current.focus(); // makes keyboard listener work immediately
     map.forEach((n) => {
-      const sibs = {};
-      n.siblingKeys.forEach(k => sibs[k] = 1);
-      nodeMap[n.key] = sibs;
+      nodeMap[n.key] = {};
+      n.siblingKeys.forEach(k => nodeMap[n.key][k] = 1);
     });
-  }, [props.map]);
+  }, [map]);
 
   return (
-    <circle
-      ref={userNodeRef}
-      onKeyDown={(e) => { keyboardListener(e); }}
-      onKeyUp={() => { keyIsDown = false; }}
-      onBlur={() => { userNodeRef.current.focus(); }}
+    <circle ref={userNodeRef}
+      onKeyDown={e => keyDownListener(e) }
+      onKeyUp={() => keyIsDown = false }
+      onBlur={() => userNodeRef.current.focus() }
       className="mz-node user-node"
-      cx={cx} cy={cy} r={r} tabIndex="0"
-    />
+      cx={cx} cy={cy} r={r} tabIndex="0" />
   );
 };
 
