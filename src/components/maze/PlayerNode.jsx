@@ -13,22 +13,11 @@ const PlayerNode = (props) => {
   const startX = cx;
   const startY = cy;
 
-  const sendPlayerHome = ({ x, y, self, graph }) => {
+  const sendPlayerHome = ({ x, y, graph }) => {
     cooldown = true;
+    const spinTheBoard = { e: graph.current, p: { rotateZ: '+=720' }, o: { duration: 'slow' } };
+    const sendPlayerBackToStart = { e: userNodeRef.current, p: { cx: x, cy: y }, o: { duration: 'slow' } };
 
-    const spinTheBoard = {
-      e: graph.current,
-      p: { rotateZ: '720deg' },
-      o: { duration: 1000 },
-    };
-
-    const sendPlayerBackToStart = {
-      e: userNodeRef.current,
-      p: { cx: x, cy: y },
-      o: { duration: 'slow' },
-    };
-
-    // uses promises to run animations sequentially
     Velocity.animate(spinTheBoard)
       .then(() => { Velocity.animate(sendPlayerBackToStart); })
       .then(() => {
@@ -36,7 +25,8 @@ const PlayerNode = (props) => {
         keyboardCoolDown = false;
         cx = x;
         cy = y;
-      });
+      })
+      .catch(e => console.error(e));
   };
 
   const determineNextMove = (current, backwardsKey) => {
@@ -58,43 +48,33 @@ const PlayerNode = (props) => {
     cooldown = false;
   };
 
-  const move = (translation) => {
+  const move = ({ x, y }) => {
     const currentKey = `${cx}.${cy}`;
-    const nextX = (translation.x || 0) + cx;
-    const nextY = (translation.y || 0) + cy;
-    const newKey = `${nextX}.${nextY}`;
+    cx += x || 0;
+    cy += y || 0;
+    const newKey = `${cx}.${cy}`;
 
-    if (nodeMap[currentKey][newKey]) {
-      const completion = () => {
-        cx = nextX;
-        cy = nextY;
+    if (!nodeMap[currentKey][newKey]) {
+      [cx, cy] = currentKey.split('.').map(val => +val);
+      return;
+    }
+
+    const moveNodeLocation = {
+      e: userNodeRef.current, p: { cx, cy, translateZ: 0 }, o: { duration: 50 },
+    };
+
+    Velocity.animate(moveNodeLocation)
+      .then(() => {
         if (newKey === destnodekey) {
-          const payload = {
-            x: startX,
-            y: startY,
-            self: userNodeRef,
-            graph: mzgraphref,
-          };
           eventServer.emit(
             events.MAZEGAME.DESTFOUND,
-            payload,
+            { x: startX, y: startY, graph: mzgraphref },
             sendPlayerHome,
           );
-        } else {
+        } else if (newKey !== destnodekey) {
           determineNextMove(newKey, currentKey);
         }
-      };
-
-      // animate
-      Velocity.animate({
-        e: userNodeRef.current,
-        p: { cx: nextX, cy: nextY, completion, translateZ: 0 },
-        o: {
-          duration: 50,
-          easing: 'linear',
-        },
-      });
-    }
+      }).catch(e => console.error(e));
   };
 
   const keyboardListener = (e) => {
@@ -121,9 +101,7 @@ const PlayerNode = (props) => {
 
   useEffect(() => {
     if (!props.map) { return; }
-    if (!destnodekey) {
-      destnodekey = props.destnodekey;
-    }
+    destnodekey = props.destnodekey;
     handleswipebindings(keyboardListener);
     userNodeRef.current.focus(); // makes keyboard listener work immediately
     map.forEach((n) => {
