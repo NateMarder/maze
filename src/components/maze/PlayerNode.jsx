@@ -9,7 +9,7 @@ const PlayerNode = (props) => {
   let userNodeRef = React.createRef();
   const nodeMap = {};
   let [cooldown, keyboardCoolDown, keyIsDown] = [false, false, false];
-  let { cx, cy, r, offset, map, handleswipebindings, destnodekey, mzgraphref } = props;
+  let { cx, cy, r, offset, map, destnodekey, mzgraphref } = props;
   const [startX, startY] = [cx, cy];
 
   const sendPlayerHome = ({ x, y, graph }) => {
@@ -32,7 +32,12 @@ const PlayerNode = (props) => {
   const determineNextMove = (current, backwardsKey) => {
     const siblingKeys = Object.keys(nodeMap[current]);
     if (siblingKeys.length !== 2) {
+      cooldown = false;
       return;
+    }
+
+    if (siblingKeys.length === 2) {
+      cooldown = true;
     }
 
     const nextKey = siblingKeys.find(k => k !== backwardsKey); // first index of non backwards key
@@ -44,8 +49,6 @@ const PlayerNode = (props) => {
     } else if (newY !== oldY) {
       move({ y: newY < oldY ? -offset : offset });
     }
-
-    cooldown = false;
   };
 
   const move = ({ x, y }) => {
@@ -100,10 +103,9 @@ const PlayerNode = (props) => {
   };
 
   useEffect(() => {
-    if (!map) { return; }
+    if (!map) return;
 
     destnodekey = props.destnodekey;
-    handleswipebindings(keyDownListener);
     userNodeRef.current.focus(); // makes keyboard listener work immediately
     map.forEach((n) => {
       nodeMap[n.key] = {};

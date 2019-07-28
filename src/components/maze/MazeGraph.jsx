@@ -103,7 +103,7 @@ export default class MazeGraph extends React.Component {
 
   getInnerWalls = () => this.state.walls.map((wall) => {
     const { id, x1, y1, x2, y2 } = wall;
-    return (<MazeWall key={id} id={id} x1={x1} y1={y1} x2={x2} y2={y2} className="mz-wall insidewall" />);
+    return <MazeWall key={id} id={id} x1={x1} y1={y1} x2={x2} y2={y2} className="mz-wall insidewall" />;
   });
 
   getOutterWalls = () => {
@@ -116,18 +116,22 @@ export default class MazeGraph extends React.Component {
     </>;
   };
 
-  render = () => (
+  render = () => {
+    const { destNodeX, destNodeY, width, height } = this.state;
+
+    return (
       <div ref={this.mazeGraphRef}>
-        <svg width={this.state.width} height={this.state.height} id="mz-svg">
+        <svg width={width} height={height} id="mz-svg">
           {this.getOutterWalls()}
           {this.getInnerWalls()}
           {this.getUserControlNode()}
           <DestinationNode
-            x={this.state.destNodeX}
-            y={this.state.destNodeY}
+            x={destNodeX}
+            y={destNodeY}
             r={Math.round(DEFAULTS.desktopSpacing * 0.10)}
           />
         </svg>
       </div>
-  );
+    );
+  };
 }
